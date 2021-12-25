@@ -30,8 +30,14 @@ router.put('/:key', async (req, res) => {
   const cacheKey = req.params.key;
   const cacheVal = req.body.value;
   console.log('Create or replace a cache entry with key: ' + cacheKey);
-  var entry = await cacheService.putValue(cacheKey, cacheVal);
-  res.json(entry);
+  var cacheRes = await cacheService.putValue(cacheKey, cacheVal);
+
+  if (cacheRes.isNewItem) {
+    res.status(201);
+    res.json(cacheRes.item);
+  }
+
+  res.json(cacheRes.item);
 })
 
 router.delete('/:key', async (req, res) => {

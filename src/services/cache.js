@@ -31,12 +31,19 @@ async function putRandomValue(key) {
 async function putValue(key, val) {
   var entry = new cacheEntry({ _id: key, createdAt: Date.now(), value: val })
 
-  var entryRes = await cacheEntry.findByIdAndUpdate(key, entry);
-  if (entryRes === null) {
-    entryRes = await createCacheItem(entry);
+  var cacheRes = await cacheEntry.findByIdAndUpdate(key, entry);
+  if (cacheRes === null) {
+    cacheRes = await createCacheItem(entry);
+    return { isNewItem: true, item: { before: null, after: { key: cacheRes._id, value: cacheRes.value } } };
   }
 
-  return entryRes;
+  return {
+    isNewItem: false,
+    item: {
+      before: { key: cacheRes._id, value: cacheRes.value },
+      after: { key: entry._id, value: entry.value },
+    }
+  };
 }
 
 async function tryDelete(key) {
