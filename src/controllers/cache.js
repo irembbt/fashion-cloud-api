@@ -27,12 +27,14 @@ router.put('/:key', async (req, res) => {
 router.delete('/:key', async (req, res) => {
   const cacheKey = req.params.key
   console.log('Delete single cache entry with key: ' + cacheKey)
-  res.json()
+  var deleteRes = await cacheService.tryDelete(cacheKey);
+  res.json(deleteRes);
 })
 
 router.delete('/', async (req, res) => {
-  console.log('Flush the cache')
-  res.json()
+  console.log('Flush the cache');
+  var flushRes = await cacheService.flushAllKeys();
+  res.json(flushRes);
 })
 
 

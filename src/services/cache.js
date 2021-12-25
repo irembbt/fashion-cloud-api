@@ -2,15 +2,15 @@ const crypto = require('crypto');
 const config = require('../config/cache');
 const cacheEntry = require('../models/cache');
 
-function tryGetValue(key) {
+async function tryGetValue(key) {
 
 }
 
-function listAllKeys() {
+async function listAllKeys() {
 
 }
 
-function putRandomValue(key) {
+async function putRandomValue(key) {
   var randVal = crypto.randomBytes(32).toString("hex");
   return putValue(key, randVal);
 }
@@ -26,12 +26,16 @@ async function putValue(key, val) {
   return entryRes;
 }
 
-function tryDelete(key) {
+async function tryDelete(key) {
+  var flushRes = await cacheEntry.findByIdAndDelete(key);
 
+  return flushRes;
 }
 
-function flushAllKeys() {
+async function flushAllKeys() {
+  var flushRes = await cacheEntry.deleteMany({});
 
+  return flushRes;
 }
 
 async function createCacheItem(item) {
@@ -48,3 +52,7 @@ async function createCacheItem(item) {
 }
 
 module.exports.putValue = putValue;
+module.exports.tryGetValue = tryGetValue;
+module.exports.listAllKeys = listAllKeys;
+module.exports.tryDelete = tryDelete;
+module.exports.flushAllKeys = flushAllKeys;
