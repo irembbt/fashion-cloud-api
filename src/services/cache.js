@@ -4,7 +4,7 @@ const cacheEntry = require('../models/cache');
 const mongoose = require('mongoose');
 
 async function tryGetValue(key) {
-  var entry = await cacheEntry.findById(key);
+  var entry = await cacheEntry.findByIdAndUpdate(key, { createdAt: Date.now() });
 
   if (entry === null) {
     console.log('Cache miss')
@@ -13,8 +13,10 @@ async function tryGetValue(key) {
     return { 'isCacheHit': false, item: { key: entry._id, value: entry.value } };
   }
 
-  console.log('Cache hit');
-  return { 'isCacheHit': true, item: { key: entry._id, value: entry.value } };
+  else {
+    console.log('Cache hit');
+    return { 'isCacheHit': true, item: { key: entry._id, value: entry.value } };
+  }
 }
 
 async function listAllKeys() {
