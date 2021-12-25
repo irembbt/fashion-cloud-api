@@ -1,6 +1,6 @@
 const config = {
   'dbUri': 'mongodb://localhost:27017',
-  'ttl': 30 * 1000,
+  'ttl': 30,
   'maxCacheSize': 10,
 }
 

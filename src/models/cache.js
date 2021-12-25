@@ -1,8 +1,9 @@
 var mongoose = require('mongoose');
+var config = require('../config/cache');
 
 const cacheEntrySchema = new mongoose.Schema({
   _id: 'string',
-  expireAt: { type: 'number', required: true },
+  createdAt: { type: Date, required: true, expires: config.ttl },
   value: { type: 'string', required: true },
 });
 
