@@ -6,22 +6,24 @@ const cacheService = require('../services/cache');
 const router = express.Router();
 
 router.get('/:key', async (req, res) => {
-  const cacheKey = req.params.key
-  console.log('Get single cache entry with key: ' + cacheKey)
-  res.json()
+  const cacheKey = req.params.key;
+  console.log('Get single cache entry with key: ' + cacheKey);
+  const cachedItem = await cacheService.tryGetValue(cacheKey);
+  res.json(cachedItem);
 })
 
 router.get('/', async (req, res) => {
-  console.log('Get all cache entries')
-  res.json()
+  console.log('Get all cache keys');
+  const allKeys = await cacheService.listAllKeys();
+  res.json(allKeys);
 })
 
 router.put('/:key', async (req, res) => {
-  const cacheKey = req.params.key
-  const cacheVal = req.body.value
-  console.log('Create or replace a cache entry with key: ' + cacheKey)
-  var entry = await cacheService.putValue(cacheKey, cacheVal)
-  res.json(entry)
+  const cacheKey = req.params.key;
+  const cacheVal = req.body.value;
+  console.log('Create or replace a cache entry with key: ' + cacheKey);
+  var entry = await cacheService.putValue(cacheKey, cacheVal);
+  res.json(entry);
 })
 
 router.delete('/:key', async (req, res) => {

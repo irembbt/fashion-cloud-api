@@ -3,16 +3,28 @@ const config = require('../config/cache');
 const cacheEntry = require('../models/cache');
 
 async function tryGetValue(key) {
+  var entry = await cacheEntry.findById(key);
 
+  if (entry === null) {
+    console.log('Cache miss')
+    entry = await putRandomValue(key);
+
+    return entry;
+  }
+
+  console.log('Cache hit')
+  return entry;
 }
 
 async function listAllKeys() {
-
+  const allKeys = await cacheEntry.find({});
+  return allKeys.map(c => c._id);
 }
 
 async function putRandomValue(key) {
   var randVal = crypto.randomBytes(32).toString("hex");
-  return putValue(key, randVal);
+  var entry = new cacheEntry({ _id: key, createdAt: Date.now(), value: randVal });
+  return await createCacheItem(entry);
 }
 
 async function putValue(key, val) {
