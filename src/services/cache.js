@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const config = require('../config/cache');
 const cacheEntry = require('../models/cache');
+const mongoose = require('mongoose');
 
 async function tryGetValue(key) {
   var entry = await cacheEntry.findById(key);
@@ -9,11 +10,11 @@ async function tryGetValue(key) {
     console.log('Cache miss')
     entry = await putRandomValue(key);
 
-    return entry;
+    return { 'isCacheHit': false, item: { key: entry._id, value: entry.value } };
   }
 
-  console.log('Cache hit')
-  return entry;
+  console.log('Cache hit');
+  return { 'isCacheHit': true, item: { key: entry._id, value: entry.value } };
 }
 
 async function listAllKeys() {
@@ -39,28 +40,38 @@ async function putValue(key, val) {
 }
 
 async function tryDelete(key) {
-  var flushRes = await cacheEntry.findByIdAndDelete(key);
+  var deletedItem = await cacheEntry.findByIdAndDelete(key);
 
-  return flushRes;
+  if (deletedItem === null) {
+    return { isItemDeleted: false };
+  }
+
+  return { isItemDeleted: true, deletedItem: { key: deletedItem._id, value: deletedItem.value } };
 }
 
 async function flushAllKeys() {
   var flushRes = await cacheEntry.deleteMany({});
 
-  return flushRes;
+  return flushRes.deletedCount;
 }
 
 async function createCacheItem(item) {
-  var currentCacheSize = await cacheEntry.count();
+  const session = await mongoose.startSession();
 
-  if (currentCacheSize >= config.maxCacheSize) {
-    var res = await cacheEntry.find().sort({ createdAt: 1 }).limit(1).remove();
+  var response;
 
-    console.log('Dropped a key from cache');
-  }
-  await item.save();
+  // withTransaction apparently doesn't return the callbacks return value.
+  await session.withTransaction(async () => {
+    var currentCacheSize = await cacheEntry.count();
 
-  return item
+    if (currentCacheSize >= config.maxCacheSize) {
+      await cacheEntry.find().sort({ createdAt: 1 }).limit(1).deleteOne();
+      console.log('Dropped a key from cache');
+    }
+    response = await item.save();
+  });
+
+  return response;
 }
 
 module.exports.putValue = putValue;
