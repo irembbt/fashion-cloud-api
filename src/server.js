@@ -9,4 +9,6 @@ async function start(app) {
   })
 }
 
-start(app)
+start(app);
+
+module.exports = app;
