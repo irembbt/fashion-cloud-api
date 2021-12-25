@@ -1,0 +1,21 @@
+{
+  "name": "mongo_cache_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "node src/server.js",
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.1",
+    "express": "^4.17.2",
+    "express-validator": "^6.14.0",
+    "mongodb": "^4.2.2"
+  },
+  "devDependencies": {
+    "mocha": "^9.1.3"
+  }
+}
